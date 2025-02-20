@@ -1,0 +1,56 @@
+{
+priv type! EndOfFile
+pub type! LexError {
+  UnrecognizedChar(@syntax.Pos, Char)
+} derive(Show)
+
+struct LineTrackingContext {
+  mut line: Int
+  mut line_start: Int
+}
+
+fn new_line(self : LineTrackingContext, pos: Int) -> Unit {
+  self.line += 1
+  self.line_start = pos
+}
+
+fn pos(self : LineTrackingContext, pos: Int) -> @syntax.Pos {
+  { line: self.line, character: pos - self.line_start }
+}
+}
+
+rule token(line_ctx : LineTrackingContext) -> (@parser.Token, @syntax.Pos, @syntax.Pos)!Error {
+  parse {
+    [' ' '\t' '\r']+ => { token!(line_ctx, lexbuf) }
+    '\n' as t => { line_ctx.new_line($endpos(t)); token!(line_ctx, lexbuf) }
+    "if" as t => { (IF, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "then" as t => { (THEN, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "else" as t => { (ELSE, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "zero" as t => { (ZERO, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "succ" as t => { (SUCC, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "pred" as t => { (PRED, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "iszero" as t => { (ISZERO, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "true" as t => { (TRUE, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "false" as t => { (FALSE, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    eof => { raise EndOfFile }
+    _ as t => { raise UnrecognizedChar(line_ctx.pos($startpos(t)), t[0]) }
+  }
+}
+
+{
+pub fn tokenize(input : String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)]!LexError {
+  let buf = Lexbuf::from_string(input)
+  let line_ctx = { line: 1, line_start: 0 }
+  let result = []
+  while true {
+    try token!(line_ctx, buf) catch {
+      EndOfFile => break
+      UnrecognizedChar(_) as err => raise err
+      _ => panic()
+    } else {
+      triple => result.push(triple)
+    }
+  }
+  result
+}
+}

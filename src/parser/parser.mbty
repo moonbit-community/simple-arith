@@ -1,0 +1,35 @@
+%start expr
+%derive<Show> Token
+%position<@syntax.Pos>
+
+%token TRUE
+%token FALSE
+%token IF
+%token THEN
+%token ELSE
+%token ZERO
+%token SUCC
+%token PRED
+%token ISZERO
+
+%type<@syntax.Term> expr arith_expr atom_expr
+
+%%
+
+expr
+  : arith_expr                            { $1 }
+  | IF e1=expr THEN e2=expr ELSE e3=expr  { TmIf({loc_start: $startpos, loc_end: $endpos}, e1, e2, e3) }
+  ;
+
+arith_expr
+  : atom_expr                             { $1 }
+  | SUCC e1=arith_expr                    { TmSucc({loc_start: $startpos, loc_end: $endpos}, e1) }
+  | PRED e1=arith_expr                    { TmPred({loc_start: $startpos, loc_end: $endpos}, e1) }
+  | ISZERO e1=arith_expr                  { TmIsZero({loc_start: $startpos, loc_end: $endpos}, e1) }
+  ;
+
+atom_expr
+  : ZERO                                  { TmZero({loc_start: $startpos, loc_end: $endpos}) }
+  | TRUE                                  { TmTrue({loc_start: $startpos, loc_end: $endpos}) }
+  | FALSE                                 { TmFalse({loc_start: $startpos, loc_end: $endpos}) }
+  ;

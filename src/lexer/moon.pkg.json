@@ -1,0 +1,13 @@
+{
+  "import": [
+    { "path": "simple-arith/syntax", "alias": "syntax" },
+    { "path": "simple-arith/parser", "alias": "parser" }
+  ],
+  "pre-build": [
+    {
+      "command": "$mod_dir/.mooncakes/moonbitlang/lex/moonlex $input -o $output",
+      "input": "lexer.mbtx",
+      "output": "lexer.mbt"
+    }
+  ]
+}

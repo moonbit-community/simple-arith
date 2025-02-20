@@ -1,0 +1,13 @@
+{
+  "import": [
+    { "path": "simple-arith/syntax", "alias": "syntax" }
+  ],
+  "pre-build": [
+    {
+      "command": "$mod_dir/.mooncakes/moonbitlang/yacc/moonyacc $input -o $output",
+      "input": "parser.mbty",
+      "output": "parser.mbt"
+    }
+  ],
+  "warn-list": "-6"
+}
