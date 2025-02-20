@@ -1,0 +1,47 @@
+package simple-arith/parser
+
+alias @simple-arith/syntax as @syntax
+
+// Values
+fn expr(Array[(Token, @syntax.Pos, @syntax.Pos)], initial_pos? : @syntax.Pos) -> @syntax.Term!ParseError
+
+// Types and methods
+pub type! ParseError {
+  UnexpectedToken(Token, (@syntax.Pos, @syntax.Pos), Array[TokenKind])
+  UnexpectedEndOfInput(@syntax.Pos, Array[TokenKind])
+}
+
+pub(all) enum Token {
+  TRUE
+  FALSE
+  IF
+  THEN
+  ELSE
+  ZERO
+  SUCC
+  PRED
+  ISZERO
+}
+impl Token {
+  kind(Self) -> TokenKind
+}
+impl Show for Token
+
+pub(all) enum TokenKind {
+  TK_TRUE
+  TK_FALSE
+  TK_IF
+  TK_THEN
+  TK_ELSE
+  TK_ZERO
+  TK_SUCC
+  TK_PRED
+  TK_ISZERO
+}
+impl Show for TokenKind
+
+// Type aliases
+pub typealias Position = @syntax.Pos
+
+// Traits
+

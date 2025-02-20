@@ -1,0 +1,29 @@
+package simple-arith/interpreter
+
+alias @simple-arith/syntax as @syntax
+
+// Values
+fn eval(@syntax.Term) -> Value!EvalError
+
+// Types and methods
+pub type! EvalError {
+  TypeAssertFail(Value, Type)
+}
+impl Show for EvalError
+
+pub(all) enum Type {
+  BoolType
+  IntType
+}
+impl Show for Type
+
+pub(all) enum Value {
+  Bool(Bool)
+  Int(Int)
+}
+impl Show for Value
+
+// Type aliases
+
+// Traits
+

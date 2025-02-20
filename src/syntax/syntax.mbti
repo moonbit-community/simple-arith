@@ -1,0 +1,32 @@
+package simple-arith/syntax
+
+// Values
+
+// Types and methods
+pub(all) struct Info {
+  loc_start : Pos
+  loc_end : Pos
+}
+impl Show for Info
+
+pub(all) struct Pos {
+  line : Int
+  character : Int
+}
+impl Show for Pos
+
+pub(all) enum Term {
+  TmTrue(Info)
+  TmFalse(Info)
+  TmIf(Info, Term, Term, Term)
+  TmZero(Info)
+  TmSucc(Info, Term)
+  TmPred(Info, Term)
+  TmIsZero(Info, Term)
+}
+impl Show for Term
+
+// Type aliases
+
+// Traits
+
