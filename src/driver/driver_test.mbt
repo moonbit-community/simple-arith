@@ -1,6 +1,6 @@
 ///|
-test "zero" {
-  inspect!(eval?("zero"), content="Ok(Int(0))")
+test "0" {
+  inspect!(eval?("0"), content="Ok(Int(0))")
 }
 
 ///|
@@ -9,19 +9,19 @@ test "true" {
 }
 
 ///|
-test "succ zero" {
-  inspect!(eval?("succ zero"), content="Ok(Int(1))")
+test "succ 0" {
+  inspect!(eval?("succ 0"), content="Ok(Int(1))")
 }
 
 ///|
-test "pred succ zero" {
-  inspect!(eval?("pred succ zero"), content="Ok(Int(0))")
+test "pred succ 0" {
+  inspect!(eval?("pred succ 0"), content="Ok(Int(0))")
 }
 
 ///|
-test "if is_zero succ zero then succ zero else zero" {
+test "if is_zero succ 0 then succ 0 else 0" {
   inspect!(
-    eval?("if iszero succ zero then succ zero else zero"),
+    eval?("if iszero succ 0 then succ 0 else 0"),
     content="Ok(Int(0))",
   )
 }
@@ -29,15 +29,15 @@ test "if is_zero succ zero then succ zero else zero" {
 ///|
 test {
   inspect!(
-    eval?("0"),
-    content="Err(UnrecognizedChar({line: 1, character: 0}, '0'))",
+    eval?("zero"),
+    content="Err(UnrecognizedChar({line: 1, character: 0}, 'z'))",
   )
 }
 
 ///|
 test {
   inspect!(
-    eval?("if zero then true else false"),
+    eval?("if 0 then true else false"),
     content="Err(TypeAssertFail(Int(0), IntType))",
   )
 }

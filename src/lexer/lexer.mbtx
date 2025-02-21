@@ -26,7 +26,7 @@ rule token(line_ctx : LineTrackingContext) -> (@parser.Token, @syntax.Pos, @synt
     "if" as t => { (IF, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "then" as t => { (THEN, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "else" as t => { (ELSE, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
-    "zero" as t => { (ZERO, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
+    "0" as t => { (ZERO, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "succ" as t => { (SUCC, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "pred" as t => { (PRED, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "iszero" as t => { (ISZERO, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
