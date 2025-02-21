@@ -14,14 +14,14 @@ test "succ 0" {
 }
 
 ///|
-test "pred succ 0" {
-  inspect!(eval?("pred succ 0"), content="Ok(Int(0))")
+test "pred (succ 0)" {
+  inspect!(eval?("pred (succ 0)"), content="Ok(Int(0))")
 }
 
 ///|
-test "if is_zero succ 0 then succ 0 else 0" {
+test "if is_zero (succ 0) then succ 0 else 0" {
   inspect!(
-    eval?("if iszero succ 0 then succ 0 else 0"),
+    eval?("if iszero (succ 0) then succ 0 else 0"),
     content="Ok(Int(0))",
   )
 }

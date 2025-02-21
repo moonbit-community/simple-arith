@@ -11,6 +11,8 @@
 %token SUCC
 %token PRED
 %token ISZERO
+%token LPAREN
+%token RPAREN
 
 %type<@syntax.Term> expr arith_expr atom_expr
 
@@ -32,4 +34,5 @@ atom_expr
   : ZERO                                  { TmZero({loc_start: $startpos, loc_end: $endpos}) }
   | TRUE                                  { TmTrue({loc_start: $startpos, loc_end: $endpos}) }
   | FALSE                                 { TmFalse({loc_start: $startpos, loc_end: $endpos}) }
+  | LPAREN expr RPAREN                    { $2 }
   ;

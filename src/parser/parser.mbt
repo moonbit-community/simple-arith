@@ -10,6 +10,8 @@ pub(all) enum Token {
   SUCC
   PRED
   ISZERO
+  LPAREN
+  RPAREN
 } derive(Show)
 
 pub fn Token::kind(self : Token) -> TokenKind {
@@ -23,6 +25,8 @@ pub fn Token::kind(self : Token) -> TokenKind {
     SUCC => TK_SUCC
     PRED => TK_PRED
     ISZERO => TK_ISZERO
+    LPAREN => TK_LPAREN
+    RPAREN => TK_RPAREN
   }
 }
 
@@ -36,6 +40,8 @@ pub(all) enum TokenKind {
   TK_SUCC
   TK_PRED
   TK_ISZERO
+  TK_LPAREN
+  TK_RPAREN
 }
 
 pub impl Show for TokenKind with output(self, logger) {
@@ -50,6 +56,8 @@ pub impl Show for TokenKind with output(self, logger) {
       TK_SUCC => "SUCC"
       TK_PRED => "PRED"
       TK_ISZERO => "ISZERO"
+      TK_LPAREN => "LPAREN"
+      TK_RPAREN => "RPAREN"
     }
   )
 }
@@ -87,6 +95,8 @@ priv enum YYSymbol {
   T_SUCC
   T_PRED
   T_ISZERO
+  T_LPAREN
+  T_RPAREN
   NT_expr
   NT_arith_expr
   NT_atom_expr
@@ -159,6 +169,11 @@ fn yy_action_8(_last_pos : Position, _args : ArrayView[(YYObj, Position, Positio
   YYObj__syntax_Term({();  TmFalse({loc_start: _start_pos, loc_end: _end_pos}) })
 }
 
+fn yy_action_9(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
+  guard let YYObj__syntax_Term(_dollar2) = _args[1].0
+  YYObj__syntax_Term({();  _dollar2 })
+}
+
 fn yy_input(token : Token, _start_pos : Position, _end_pos : Position) -> (YYSymbol, YYObj) {
   match token {
     TRUE => (T_TRUE, YYObj_Void)
@@ -170,6 +185,8 @@ fn yy_input(token : Token, _start_pos : Position, _end_pos : Position) -> (YYSym
     SUCC => (T_SUCC, YYObj_Void)
     PRED => (T_PRED, YYObj_Void)
     ISZERO => (T_ISZERO, YYObj_Void)
+    LPAREN => (T_LPAREN, YYObj_Void)
+    RPAREN => (T_RPAREN, YYObj_Void)
   }
 }
 
@@ -182,132 +199,181 @@ fn yy_input(token : Token, _start_pos : Position, _end_pos : Position) -> (YYSym
 // [6, atom_expr → • ZERO, $]
 // [7, atom_expr → • TRUE, $]
 // [8, atom_expr → • FALSE, $]
-// [9, expr_prime → • expr, $]
+// [9, atom_expr → • LPAREN expr RPAREN, $]
+// [10, expr_prime → • expr, $]
 fn yy_state_0(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
     NT_expr => Shift(yy_state_1)
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
-    T_IF => Shift(yy_state_12)
-    NT_arith_expr => Shift(yy_state_18)
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
+    T_IF => Shift(yy_state_15)
+    NT_arith_expr => Shift(yy_state_21)
     _ => Error
   }
 }
 
-// [9, expr_prime → expr •, $]
+// [10, expr_prime → expr •, $]
 fn yy_state_1(_lookahead : YYSymbol) -> YYDecision {
   Accept
 }
 
-// [8, atom_expr → FALSE •, $ / THEN / ELSE]
+// [0, expr → • arith_expr, RPAREN]
+// [1, expr → • IF expr THEN expr ELSE expr, RPAREN]
+// [2, arith_expr → • atom_expr, RPAREN]
+// [3, arith_expr → • SUCC arith_expr, RPAREN]
+// [4, arith_expr → • PRED arith_expr, RPAREN]
+// [5, arith_expr → • ISZERO arith_expr, RPAREN]
+// [6, atom_expr → • ZERO, RPAREN]
+// [7, atom_expr → • TRUE, RPAREN]
+// [8, atom_expr → • FALSE, RPAREN]
+// [9, atom_expr → • LPAREN expr RPAREN, RPAREN]
+// [9, atom_expr → LPAREN • expr RPAREN, $ / THEN / ELSE / RPAREN]
 fn yy_state_2(_lookahead : YYSymbol) -> YYDecision {
+  match _lookahead {
+    T_LPAREN => Shift(yy_state_2)
+    NT_expr => Shift(yy_state_3)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
+    T_IF => Shift(yy_state_15)
+    NT_arith_expr => Shift(yy_state_21)
+    _ => Error
+  }
+}
+
+// [9, atom_expr → LPAREN expr • RPAREN, $ / THEN / ELSE / RPAREN]
+fn yy_state_3(_lookahead : YYSymbol) -> YYDecision {
+  match _lookahead {
+    T_RPAREN => Shift(yy_state_4)
+    _ => Error
+  }
+}
+
+// [9, atom_expr → LPAREN expr RPAREN •, $ / THEN / ELSE / RPAREN]
+fn yy_state_4(_lookahead : YYSymbol) -> YYDecision {
+  ReduceNoLookahead(3, NT_atom_expr, yy_action_9)
+}
+
+// [8, atom_expr → FALSE •, $ / THEN / ELSE / RPAREN]
+fn yy_state_5(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(1, NT_atom_expr, yy_action_8)
 }
 
-// [7, atom_expr → TRUE •, $ / THEN / ELSE]
-fn yy_state_3(_lookahead : YYSymbol) -> YYDecision {
+// [7, atom_expr → TRUE •, $ / THEN / ELSE / RPAREN]
+fn yy_state_6(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(1, NT_atom_expr, yy_action_7)
 }
 
-// [6, atom_expr → ZERO •, $ / THEN / ELSE]
-fn yy_state_4(_lookahead : YYSymbol) -> YYDecision {
+// [6, atom_expr → ZERO •, $ / THEN / ELSE / RPAREN]
+fn yy_state_7(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(1, NT_atom_expr, yy_action_6)
 }
 
-// [2, arith_expr → • atom_expr, $ / THEN / ELSE]
-// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE]
-// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE]
-// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE]
-// [5, arith_expr → ISZERO • arith_expr, $ / THEN / ELSE]
-// [6, atom_expr → • ZERO, $ / THEN / ELSE]
-// [7, atom_expr → • TRUE, $ / THEN / ELSE]
-// [8, atom_expr → • FALSE, $ / THEN / ELSE]
-fn yy_state_5(_lookahead : YYSymbol) -> YYDecision {
+// [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
+// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE / RPAREN]
+// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE / RPAREN]
+// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE / RPAREN]
+// [5, arith_expr → ISZERO • arith_expr, $ / THEN / ELSE / RPAREN]
+// [6, atom_expr → • ZERO, $ / THEN / ELSE / RPAREN]
+// [7, atom_expr → • TRUE, $ / THEN / ELSE / RPAREN]
+// [8, atom_expr → • FALSE, $ / THEN / ELSE / RPAREN]
+// [9, atom_expr → • LPAREN expr RPAREN, $ / THEN / ELSE / RPAREN]
+fn yy_state_8(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    NT_arith_expr => Shift(yy_state_6)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    NT_arith_expr => Shift(yy_state_9)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
     _ => Error
   }
 }
 
-// [5, arith_expr → ISZERO arith_expr •, $ / THEN / ELSE]
-fn yy_state_6(_lookahead : YYSymbol) -> YYDecision {
+// [5, arith_expr → ISZERO arith_expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_9(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(2, NT_arith_expr, yy_action_5)
 }
 
-// [2, arith_expr → • atom_expr, $ / THEN / ELSE]
-// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE]
-// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE]
-// [4, arith_expr → PRED • arith_expr, $ / THEN / ELSE]
-// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE]
-// [6, atom_expr → • ZERO, $ / THEN / ELSE]
-// [7, atom_expr → • TRUE, $ / THEN / ELSE]
-// [8, atom_expr → • FALSE, $ / THEN / ELSE]
-fn yy_state_7(_lookahead : YYSymbol) -> YYDecision {
+// [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
+// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE / RPAREN]
+// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE / RPAREN]
+// [4, arith_expr → PRED • arith_expr, $ / THEN / ELSE / RPAREN]
+// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE / RPAREN]
+// [6, atom_expr → • ZERO, $ / THEN / ELSE / RPAREN]
+// [7, atom_expr → • TRUE, $ / THEN / ELSE / RPAREN]
+// [8, atom_expr → • FALSE, $ / THEN / ELSE / RPAREN]
+// [9, atom_expr → • LPAREN expr RPAREN, $ / THEN / ELSE / RPAREN]
+fn yy_state_10(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    NT_arith_expr => Shift(yy_state_8)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    NT_arith_expr => Shift(yy_state_11)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
     _ => Error
   }
 }
 
-// [4, arith_expr → PRED arith_expr •, $ / THEN / ELSE]
-fn yy_state_8(_lookahead : YYSymbol) -> YYDecision {
+// [4, arith_expr → PRED arith_expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_11(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(2, NT_arith_expr, yy_action_4)
 }
 
-// [2, arith_expr → • atom_expr, $ / THEN / ELSE]
-// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE]
-// [3, arith_expr → SUCC • arith_expr, $ / THEN / ELSE]
-// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE]
-// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE]
-// [6, atom_expr → • ZERO, $ / THEN / ELSE]
-// [7, atom_expr → • TRUE, $ / THEN / ELSE]
-// [8, atom_expr → • FALSE, $ / THEN / ELSE]
-fn yy_state_9(_lookahead : YYSymbol) -> YYDecision {
+// [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
+// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE / RPAREN]
+// [3, arith_expr → SUCC • arith_expr, $ / THEN / ELSE / RPAREN]
+// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE / RPAREN]
+// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE / RPAREN]
+// [6, atom_expr → • ZERO, $ / THEN / ELSE / RPAREN]
+// [7, atom_expr → • TRUE, $ / THEN / ELSE / RPAREN]
+// [8, atom_expr → • FALSE, $ / THEN / ELSE / RPAREN]
+// [9, atom_expr → • LPAREN expr RPAREN, $ / THEN / ELSE / RPAREN]
+fn yy_state_12(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_arith_expr => Shift(yy_state_10)
-    NT_atom_expr => Shift(yy_state_11)
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_arith_expr => Shift(yy_state_13)
+    NT_atom_expr => Shift(yy_state_14)
     _ => Error
   }
 }
 
-// [3, arith_expr → SUCC arith_expr •, $ / THEN / ELSE]
-fn yy_state_10(_lookahead : YYSymbol) -> YYDecision {
+// [3, arith_expr → SUCC arith_expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_13(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(2, NT_arith_expr, yy_action_3)
 }
 
-// [2, arith_expr → atom_expr •, $ / THEN / ELSE]
-fn yy_state_11(_lookahead : YYSymbol) -> YYDecision {
+// [2, arith_expr → atom_expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_14(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(1, NT_arith_expr, yy_action_2)
 }
 
 // [0, expr → • arith_expr, THEN]
 // [1, expr → • IF expr THEN expr ELSE expr, THEN]
-// [1, expr → IF • expr THEN expr ELSE expr, $ / THEN / ELSE]
+// [1, expr → IF • expr THEN expr ELSE expr, $ / THEN / ELSE / RPAREN]
 // [2, arith_expr → • atom_expr, THEN]
 // [3, arith_expr → • SUCC arith_expr, THEN]
 // [4, arith_expr → • PRED arith_expr, THEN]
@@ -315,33 +381,35 @@ fn yy_state_11(_lookahead : YYSymbol) -> YYDecision {
 // [6, atom_expr → • ZERO, THEN]
 // [7, atom_expr → • TRUE, THEN]
 // [8, atom_expr → • FALSE, THEN]
-fn yy_state_12(_lookahead : YYSymbol) -> YYDecision {
+// [9, atom_expr → • LPAREN expr RPAREN, THEN]
+fn yy_state_15(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
-    T_IF => Shift(yy_state_12)
-    NT_expr => Shift(yy_state_13)
-    NT_arith_expr => Shift(yy_state_18)
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
+    T_IF => Shift(yy_state_15)
+    NT_expr => Shift(yy_state_16)
+    NT_arith_expr => Shift(yy_state_21)
     _ => Error
   }
 }
 
-// [1, expr → IF expr • THEN expr ELSE expr, $ / THEN / ELSE]
-fn yy_state_13(_lookahead : YYSymbol) -> YYDecision {
+// [1, expr → IF expr • THEN expr ELSE expr, $ / THEN / ELSE / RPAREN]
+fn yy_state_16(_lookahead : YYSymbol) -> YYDecision {
   match _lookahead {
-    T_THEN => Shift(yy_state_14)
+    T_THEN => Shift(yy_state_17)
     _ => Error
   }
 }
 
 // [0, expr → • arith_expr, ELSE]
 // [1, expr → • IF expr THEN expr ELSE expr, ELSE]
-// [1, expr → IF expr THEN • expr ELSE expr, $ / THEN / ELSE]
+// [1, expr → IF expr THEN • expr ELSE expr, $ / THEN / ELSE / RPAREN]
 // [2, arith_expr → • atom_expr, ELSE]
 // [3, arith_expr → • SUCC arith_expr, ELSE]
 // [4, arith_expr → • PRED arith_expr, ELSE]
@@ -349,63 +417,67 @@ fn yy_state_13(_lookahead : YYSymbol) -> YYDecision {
 // [6, atom_expr → • ZERO, ELSE]
 // [7, atom_expr → • TRUE, ELSE]
 // [8, atom_expr → • FALSE, ELSE]
-fn yy_state_14(_lookahead : YYSymbol) -> YYDecision {
-  match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
-    T_IF => Shift(yy_state_12)
-    NT_expr => Shift(yy_state_15)
-    NT_arith_expr => Shift(yy_state_18)
-    _ => Error
-  }
-}
-
-// [1, expr → IF expr THEN expr • ELSE expr, $ / THEN / ELSE]
-fn yy_state_15(_lookahead : YYSymbol) -> YYDecision {
-  match _lookahead {
-    T_ELSE => Shift(yy_state_16)
-    _ => Error
-  }
-}
-
-// [0, expr → • arith_expr, $ / THEN / ELSE]
-// [1, expr → • IF expr THEN expr ELSE expr, $ / THEN / ELSE]
-// [1, expr → IF expr THEN expr ELSE • expr, $ / THEN / ELSE]
-// [2, arith_expr → • atom_expr, $ / THEN / ELSE]
-// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE]
-// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE]
-// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE]
-// [6, atom_expr → • ZERO, $ / THEN / ELSE]
-// [7, atom_expr → • TRUE, $ / THEN / ELSE]
-// [8, atom_expr → • FALSE, $ / THEN / ELSE]
-fn yy_state_16(_lookahead : YYSymbol) -> YYDecision {
-  match _lookahead {
-    T_FALSE => Shift(yy_state_2)
-    T_TRUE => Shift(yy_state_3)
-    T_ZERO => Shift(yy_state_4)
-    T_ISZERO => Shift(yy_state_5)
-    T_PRED => Shift(yy_state_7)
-    T_SUCC => Shift(yy_state_9)
-    NT_atom_expr => Shift(yy_state_11)
-    T_IF => Shift(yy_state_12)
-    NT_expr => Shift(yy_state_17)
-    NT_arith_expr => Shift(yy_state_18)
-    _ => Error
-  }
-}
-
-// [1, expr → IF expr THEN expr ELSE expr •, $ / THEN / ELSE]
+// [9, atom_expr → • LPAREN expr RPAREN, ELSE]
 fn yy_state_17(_lookahead : YYSymbol) -> YYDecision {
+  match _lookahead {
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
+    T_IF => Shift(yy_state_15)
+    NT_expr => Shift(yy_state_18)
+    NT_arith_expr => Shift(yy_state_21)
+    _ => Error
+  }
+}
+
+// [1, expr → IF expr THEN expr • ELSE expr, $ / THEN / ELSE / RPAREN]
+fn yy_state_18(_lookahead : YYSymbol) -> YYDecision {
+  match _lookahead {
+    T_ELSE => Shift(yy_state_19)
+    _ => Error
+  }
+}
+
+// [0, expr → • arith_expr, $ / THEN / ELSE / RPAREN]
+// [1, expr → • IF expr THEN expr ELSE expr, $ / THEN / ELSE / RPAREN]
+// [1, expr → IF expr THEN expr ELSE • expr, $ / THEN / ELSE / RPAREN]
+// [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
+// [3, arith_expr → • SUCC arith_expr, $ / THEN / ELSE / RPAREN]
+// [4, arith_expr → • PRED arith_expr, $ / THEN / ELSE / RPAREN]
+// [5, arith_expr → • ISZERO arith_expr, $ / THEN / ELSE / RPAREN]
+// [6, atom_expr → • ZERO, $ / THEN / ELSE / RPAREN]
+// [7, atom_expr → • TRUE, $ / THEN / ELSE / RPAREN]
+// [8, atom_expr → • FALSE, $ / THEN / ELSE / RPAREN]
+// [9, atom_expr → • LPAREN expr RPAREN, $ / THEN / ELSE / RPAREN]
+fn yy_state_19(_lookahead : YYSymbol) -> YYDecision {
+  match _lookahead {
+    T_LPAREN => Shift(yy_state_2)
+    T_FALSE => Shift(yy_state_5)
+    T_TRUE => Shift(yy_state_6)
+    T_ZERO => Shift(yy_state_7)
+    T_ISZERO => Shift(yy_state_8)
+    T_PRED => Shift(yy_state_10)
+    T_SUCC => Shift(yy_state_12)
+    NT_atom_expr => Shift(yy_state_14)
+    T_IF => Shift(yy_state_15)
+    NT_expr => Shift(yy_state_20)
+    NT_arith_expr => Shift(yy_state_21)
+    _ => Error
+  }
+}
+
+// [1, expr → IF expr THEN expr ELSE expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_20(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(6, NT_expr, yy_action_1)
 }
 
-// [0, expr → arith_expr •, $ / THEN / ELSE]
-fn yy_state_18(_lookahead : YYSymbol) -> YYDecision {
+// [0, expr → arith_expr •, $ / THEN / ELSE / RPAREN]
+fn yy_state_21(_lookahead : YYSymbol) -> YYDecision {
   ReduceNoLookahead(1, NT_expr, yy_action_0)
 }
 
@@ -521,7 +593,7 @@ fn error(stack : @immut/list.T[YYState], token : Token?, loc : (Position, Positi
     }
     go(stack)
   }
-  for term in ([(T_TRUE, TK_TRUE), (T_FALSE, TK_FALSE), (T_IF, TK_IF), (T_THEN, TK_THEN), (T_ELSE, TK_ELSE), (T_ZERO, TK_ZERO), (T_SUCC, TK_SUCC), (T_PRED, TK_PRED), (T_ISZERO, TK_ISZERO)] : Array[(YYSymbol, TokenKind)]) {
+  for term in ([(T_TRUE, TK_TRUE), (T_FALSE, TK_FALSE), (T_IF, TK_IF), (T_THEN, TK_THEN), (T_ELSE, TK_ELSE), (T_ZERO, TK_ZERO), (T_SUCC, TK_SUCC), (T_PRED, TK_PRED), (T_ISZERO, TK_ISZERO), (T_LPAREN, TK_LPAREN), (T_RPAREN, TK_RPAREN)] : Array[(YYSymbol, TokenKind)]) {
     try_add(term.0, term.1)
   }
   match token {
