@@ -21,6 +21,8 @@ pub(all) enum Token {
   SUCC
   PRED
   ISZERO
+  LPAREN
+  RPAREN
 }
 impl Token {
   kind(Self) -> TokenKind
@@ -37,6 +39,8 @@ pub(all) enum TokenKind {
   TK_SUCC
   TK_PRED
   TK_ISZERO
+  TK_LPAREN
+  TK_RPAREN
 }
 impl Show for TokenKind
 
