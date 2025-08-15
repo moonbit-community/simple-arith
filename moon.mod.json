@@ -2,8 +2,8 @@
   "name": "simple-arith",
   "deps": {},
   "bin-deps": {
-    "moonbitlang/lex": "0.1.3",
-    "moonbitlang/yacc": "0.2.8"
+    "moonbitlang/lex": "0.3.8",
+    "moonbitlang/yacc": "0.6.11"
   },
   "source": "src"
 }

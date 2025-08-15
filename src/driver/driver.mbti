@@ -1,9 +1,14 @@
-package simple-arith/driver
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/driver"
 
-alias @simple-arith/interpreter as @interpreter
+import(
+  "simple-arith/interpreter"
+)
 
 // Values
-fn eval(String) -> @interpreter.Value!
+fn eval(String) -> @interpreter.Value raise
+
+// Errors
 
 // Types and methods
 

@@ -1,16 +1,20 @@
-package simple-arith/interpreter
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/interpreter"
 
-alias @simple-arith/syntax as @syntax
+import(
+  "simple-arith/syntax"
+)
 
 // Values
-fn eval(@syntax.Term) -> Value!EvalError
+fn eval(@syntax.Term) -> Value raise EvalError
 
-// Types and methods
-pub type! EvalError {
+// Errors
+pub suberror EvalError {
   TypeAssertFail(Value, Type)
 }
 impl Show for EvalError
 
+// Types and methods
 pub(all) enum Type {
   BoolType
   IntType

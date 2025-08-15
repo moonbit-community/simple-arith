@@ -1,16 +1,20 @@
-package simple-arith/parser
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/parser"
 
-alias @simple-arith/syntax as @syntax
+import(
+  "simple-arith/syntax"
+)
 
 // Values
-fn expr(Array[(Token, @syntax.Pos, @syntax.Pos)], initial_pos? : @syntax.Pos) -> @syntax.Term!ParseError
+fn expr(Array[(Token, @syntax.Pos, @syntax.Pos)], initial_pos? : @syntax.Pos) -> @syntax.Term raise ParseError
 
-// Types and methods
-pub type! ParseError {
+// Errors
+pub suberror ParseError {
   UnexpectedToken(Token, (@syntax.Pos, @syntax.Pos), Array[TokenKind])
   UnexpectedEndOfInput(@syntax.Pos, Array[TokenKind])
 }
 
+// Types and methods
 pub(all) enum Token {
   TRUE
   FALSE
@@ -24,9 +28,7 @@ pub(all) enum Token {
   LPAREN
   RPAREN
 }
-impl Token {
-  kind(Self) -> TokenKind
-}
+fn Token::kind(Self) -> TokenKind
 impl Show for Token
 
 pub(all) enum TokenKind {
@@ -45,7 +47,6 @@ pub(all) enum TokenKind {
 impl Show for TokenKind
 
 // Type aliases
-pub typealias Position = @syntax.Pos
 
 // Traits
 
