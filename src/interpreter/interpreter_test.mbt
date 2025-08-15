@@ -1,7 +1,7 @@
 ///|
 test {
-  inspect!(
-    eval!(
+  inspect(
+    try? eval(
       TmIf(
         {
           loc_start: { line: 1, character: 0 },
@@ -33,5 +33,6 @@ test {
         ),
       ),
     ),
-  content="Int(0)")
+    content="Ok(Int(0))",
+  )
 }

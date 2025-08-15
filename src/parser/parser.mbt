@@ -1,4 +1,3 @@
-pub(all) typealias Position = @syntax.Pos
 
 pub(all) enum Token {
   TRUE
@@ -62,20 +61,20 @@ pub impl Show for TokenKind with output(self, logger) {
   )
 }
 
-pub type! ParseError {
-  UnexpectedToken(Token, (Position, Position), Array[TokenKind])
-  UnexpectedEndOfInput(Position, Array[TokenKind])
+pub suberror ParseError {
+  UnexpectedToken(Token, (@syntax.Pos, @syntax.Pos), Array[TokenKind])
+  UnexpectedEndOfInput(@syntax.Pos, Array[TokenKind])
 }
 
-typealias YYObj = Error
+typealias Error as YYObj
 
-priv type! YYObj_Void
+priv suberror YYObj_Void
 
-priv type! YYObj__syntax_Term @syntax.Term
+priv suberror YYObj__syntax_Term @syntax.Term
 
-typealias YYState = (YYSymbol) -> YYDecision
+typealias (YYSymbol) -> YYDecision as YYState
 
-typealias YYAction = (Position, ArrayView[(YYObj, Position, Position)]) -> YYObj
+typealias (@syntax.Pos, ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj as YYAction
 
 priv enum YYDecision {
   Accept
@@ -105,76 +104,96 @@ priv enum YYSymbol {
 
 // Workaround for EOI unused warning
 fn init {
-  match EOI {
+  match (EOI : YYSymbol) {
     EOI => ()
     _ => ()
   }
 }
 
-fn yy_action_0(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(_dollar1) = _args[0].0
-  YYObj__syntax_Term({();  _dollar1 })
-}
-
-fn yy_action_1(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(e1) = _args[1].0
-  guard let YYObj__syntax_Term(e2) = _args[3].0
-  guard let YYObj__syntax_Term(e3) = _args[5].0
-  let _start_pos = _args[0].1
-  let _end_pos = _args[5].2
-  YYObj__syntax_Term({();  TmIf({loc_start: _start_pos, loc_end: _end_pos}, e1, e2, e3) })
-}
-
-fn yy_action_2(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(_dollar1) = _args[0].0
-  YYObj__syntax_Term({();  _dollar1 })
-}
-
-fn yy_action_3(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(e1) = _args[1].0
-  let _start_pos = _args[0].1
-  let _end_pos = _args[1].2
-  YYObj__syntax_Term({();  TmSucc({loc_start: _start_pos, loc_end: _end_pos}, e1) })
-}
-
-fn yy_action_4(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(e1) = _args[1].0
-  let _start_pos = _args[0].1
-  let _end_pos = _args[1].2
-  YYObj__syntax_Term({();  TmPred({loc_start: _start_pos, loc_end: _end_pos}, e1) })
-}
-
-fn yy_action_5(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(e1) = _args[1].0
-  let _start_pos = _args[0].1
-  let _end_pos = _args[1].2
-  YYObj__syntax_Term({();  TmIsZero({loc_start: _start_pos, loc_end: _end_pos}, e1) })
-}
-
-fn yy_action_6(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  let _start_pos = _args[0].1
-  let _end_pos = _args[0].2
-  YYObj__syntax_Term({();  TmZero({loc_start: _start_pos, loc_end: _end_pos}) })
-}
-
-fn yy_action_7(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  let _start_pos = _args[0].1
-  let _end_pos = _args[0].2
-  YYObj__syntax_Term({();  TmTrue({loc_start: _start_pos, loc_end: _end_pos}) })
-}
-
-fn yy_action_8(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  let _start_pos = _args[0].1
-  let _end_pos = _args[0].2
-  YYObj__syntax_Term({();  TmFalse({loc_start: _start_pos, loc_end: _end_pos}) })
-}
-
-fn yy_action_9(_last_pos : Position, _args : ArrayView[(YYObj, Position, Position)]) -> YYObj {
-  guard let YYObj__syntax_Term(_dollar2) = _args[1].0
+// file:///./parser.mbty
+// 37|    LPAREN expr RPAREN                    { $2 }
+fn yy_action_0(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[1].0 is YYObj__syntax_Term(_dollar2)
   YYObj__syntax_Term({();  _dollar2 })
 }
 
-fn yy_input(token : Token, _start_pos : Position, _end_pos : Position) -> (YYSymbol, YYObj) {
+// file:///./parser.mbty
+// 27|    atom_expr                             { $1 }
+fn yy_action_1(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[0].0 is YYObj__syntax_Term(_dollar1)
+  YYObj__syntax_Term({();  _dollar1 })
+}
+
+// file:///./parser.mbty
+// 28|    SUCC e1=arith_expr                    { TmSucc({loc_start: $startpos, loc_end: $endpos}, e1) }
+fn yy_action_2(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[1].0 is YYObj__syntax_Term(e1)
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmSucc({loc_start: _start_pos, loc_end: _end_pos}, e1) })
+}
+
+// file:///./parser.mbty
+// 22|    arith_expr                            { $1 }
+fn yy_action_3(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[0].0 is YYObj__syntax_Term(_dollar1)
+  YYObj__syntax_Term({();  _dollar1 })
+}
+
+// file:///./parser.mbty
+// 36|    FALSE                                 { TmFalse({loc_start: $startpos, loc_end: $endpos}) }
+fn yy_action_4(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmFalse({loc_start: _start_pos, loc_end: _end_pos}) })
+}
+
+// file:///./parser.mbty
+// 35|    TRUE                                  { TmTrue({loc_start: $startpos, loc_end: $endpos}) }
+fn yy_action_5(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmTrue({loc_start: _start_pos, loc_end: _end_pos}) })
+}
+
+// file:///./parser.mbty
+// 30|    ISZERO e1=arith_expr                  { TmIsZero({loc_start: $startpos, loc_end: $endpos}, e1) }
+fn yy_action_6(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[1].0 is YYObj__syntax_Term(e1)
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmIsZero({loc_start: _start_pos, loc_end: _end_pos}, e1) })
+}
+
+// file:///./parser.mbty
+// 34|    ZERO                                  { TmZero({loc_start: $startpos, loc_end: $endpos}) }
+fn yy_action_7(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmZero({loc_start: _start_pos, loc_end: _end_pos}) })
+}
+
+// file:///./parser.mbty
+// 29|    PRED e1=arith_expr                    { TmPred({loc_start: $startpos, loc_end: $endpos}, e1) }
+fn yy_action_8(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[1].0 is YYObj__syntax_Term(e1)
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmPred({loc_start: _start_pos, loc_end: _end_pos}, e1) })
+}
+
+// file:///./parser.mbty
+// 23|    IF e1=expr THEN e2=expr ELSE e3=expr  { TmIf({loc_start: $startpos, loc_end: $endpos}, e1, e2, e3) }
+fn yy_action_9(_last_pos : @syntax.Pos, _args : ArrayView[(YYObj, @syntax.Pos, @syntax.Pos)]) -> YYObj {
+  guard _args[1].0 is YYObj__syntax_Term(e1)
+  guard _args[3].0 is YYObj__syntax_Term(e2)
+  guard _args[5].0 is YYObj__syntax_Term(e3)
+  let _start_pos = if _args.length() == 0 { _last_pos } else { _args[0].1 }
+  let _end_pos = if _args.length() == 0 { _last_pos } else { _args[_args.length() - 1].2 }
+  YYObj__syntax_Term({();  TmIf({loc_start: _start_pos, loc_end: _end_pos}, e1, e2, e3) })
+}
+
+fn yy_input(token : Token, _start_pos : @syntax.Pos, _end_pos : @syntax.Pos) -> (YYSymbol, YYObj) {
   match token {
     TRUE => (T_TRUE, YYObj_Void)
     FALSE => (T_FALSE, YYObj_Void)
@@ -261,22 +280,22 @@ fn yy_state_3(_lookahead : YYSymbol) -> YYDecision {
 
 // [9, atom_expr → LPAREN expr RPAREN •, $ / THEN / ELSE / RPAREN]
 fn yy_state_4(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(3, NT_atom_expr, yy_action_9)
+  ReduceNoLookahead(3, NT_atom_expr, yy_action_0)
 }
 
 // [8, atom_expr → FALSE •, $ / THEN / ELSE / RPAREN]
 fn yy_state_5(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(1, NT_atom_expr, yy_action_8)
+  ReduceNoLookahead(1, NT_atom_expr, yy_action_4)
 }
 
 // [7, atom_expr → TRUE •, $ / THEN / ELSE / RPAREN]
 fn yy_state_6(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(1, NT_atom_expr, yy_action_7)
+  ReduceNoLookahead(1, NT_atom_expr, yy_action_5)
 }
 
 // [6, atom_expr → ZERO •, $ / THEN / ELSE / RPAREN]
 fn yy_state_7(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(1, NT_atom_expr, yy_action_6)
+  ReduceNoLookahead(1, NT_atom_expr, yy_action_7)
 }
 
 // [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
@@ -305,7 +324,7 @@ fn yy_state_8(_lookahead : YYSymbol) -> YYDecision {
 
 // [5, arith_expr → ISZERO arith_expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_9(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(2, NT_arith_expr, yy_action_5)
+  ReduceNoLookahead(2, NT_arith_expr, yy_action_6)
 }
 
 // [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
@@ -334,7 +353,7 @@ fn yy_state_10(_lookahead : YYSymbol) -> YYDecision {
 
 // [4, arith_expr → PRED arith_expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_11(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(2, NT_arith_expr, yy_action_4)
+  ReduceNoLookahead(2, NT_arith_expr, yy_action_8)
 }
 
 // [2, arith_expr → • atom_expr, $ / THEN / ELSE / RPAREN]
@@ -363,12 +382,12 @@ fn yy_state_12(_lookahead : YYSymbol) -> YYDecision {
 
 // [3, arith_expr → SUCC arith_expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_13(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(2, NT_arith_expr, yy_action_3)
+  ReduceNoLookahead(2, NT_arith_expr, yy_action_2)
 }
 
 // [2, arith_expr → atom_expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_14(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(1, NT_arith_expr, yy_action_2)
+  ReduceNoLookahead(1, NT_arith_expr, yy_action_1)
 }
 
 // [0, expr → • arith_expr, THEN]
@@ -473,26 +492,26 @@ fn yy_state_19(_lookahead : YYSymbol) -> YYDecision {
 
 // [1, expr → IF expr THEN expr ELSE expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_20(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(6, NT_expr, yy_action_1)
+  ReduceNoLookahead(6, NT_expr, yy_action_9)
 }
 
 // [0, expr → arith_expr •, $ / THEN / ELSE / RPAREN]
 fn yy_state_21(_lookahead : YYSymbol) -> YYDecision {
-  ReduceNoLookahead(1, NT_expr, yy_action_0)
+  ReduceNoLookahead(1, NT_expr, yy_action_3)
 }
 
-fn yy_parse[T](
-  tokens : Array[(Token, Position, Position)],
+fn[T] yy_parse(
+  tokens : Array[(Token, @syntax.Pos, @syntax.Pos)],
   start : YYState,
   return_ : (YYObj) -> T,
-  initial_pos? : Position,
-) -> T!ParseError {
+  initial_pos? : @syntax.Pos,
+) -> T raise ParseError {
   let mut cursor = 0
-  let mut state_stack : @immut/list.T[YYState] = Cons(start, Nil)
-  let data_stack : Array[(YYObj, Position, Position)] = []
-  let mut last_pos = initial_pos.or(tokens[0].1)
+  let mut state_stack : @list.List[YYState] = @list.construct(start, @list.empty())
+  let data_stack : Array[(YYObj, @syntax.Pos, @syntax.Pos)] = []
+  let mut last_pos = initial_pos.unwrap_or(tokens[0].1)
   let mut state = start
-  let mut lookahead : Option[(YYSymbol, (YYObj, Position, Position), Token?)] = None
+  let mut lookahead : Option[(YYSymbol, (YYObj, @syntax.Pos, @syntax.Pos), Token?)] = None
   let mut last_shifted_state_stack = state_stack
   while true {
     let decision = match state(EOI) {
@@ -518,9 +537,9 @@ fn yy_parse[T](
     match decision {
       Accept => return return_(data_stack.unsafe_pop().0)
       Shift(next_state) => {
-        guard let Some(la) = lookahead
+        guard lookahead is Some(la)
         data_stack.push(la.1)
-        state_stack = Cons(next_state, state_stack)
+        state_stack = @list.construct(next_state, state_stack)
         last_shifted_state_stack = state_stack
         state = next_state
         last_pos = la.1.2
@@ -539,14 +558,14 @@ fn yy_parse[T](
             }
             for i in 0..<count {
               ignore(data_stack.unsafe_pop())
-              state_stack = state_stack.tail()
+              state_stack = state_stack.unsafe_tail()
             }
             state = state_stack.unsafe_head()
             data_stack.push((data, start_pos, end_pos))
             match state(symbol) {
               Accept => return return_(data_stack.unsafe_pop().0)
               Shift(next_state) => {
-                state_stack = Cons(next_state, state_stack)
+                state_stack = @list.construct(next_state, state_stack)
                 state = next_state
               }
               Reduce(count, symbol, action)
@@ -558,28 +577,28 @@ fn yy_parse[T](
       }
       Error => {
         let (_, (_, start_pos, end_pos), token) = lookahead.unwrap()
-        error!(last_shifted_state_stack, token, (start_pos, end_pos))
+        error(last_shifted_state_stack, token, (start_pos, end_pos))
       }
     }
   }
   panic()
 }
 
-fn error(stack : @immut/list.T[YYState], token : Token?, loc : (Position, Position)) -> Unit!ParseError {
+fn error(stack : @list.List[YYState], token : Token?, loc : (@syntax.Pos, @syntax.Pos)) -> Unit raise ParseError {
   let expected = []
   fn try_add(symbol : YYSymbol, kind : TokenKind) {
-    fn go(stack : @immut/list.T[YYState]) {
+    fn go(stack : @list.List[YYState]) {
       match stack {
-        Nil => ()
-        Cons(state, _) => {
+        Empty => ()
+        More(state, ..) => {
           match state(symbol) {
             Accept | Shift(_) => expected.push(kind)
             Reduce(count, symbol, _) | ReduceNoLookahead(count, symbol, _) => {
-              fn inner_go(stack : @immut/list.T[YYState], count, symbol) {
+              fn inner_go(stack : @list.List[YYState], count, symbol) {
                 let stack = stack.drop(count)
-                guard let Cons(state, _) = stack
+                guard stack is More(state, ..)
                 match state(symbol) {
-                  Shift(state) => go(Cons(state, stack))
+                  Shift(state) => go(@list.construct(state, stack))
                   Reduce(count, symbol, _) | ReduceNoLookahead(count, symbol, _) => inner_go(stack, count, symbol)
                   _ => panic()
                 }
@@ -602,13 +621,13 @@ fn error(stack : @immut/list.T[YYState], token : Token?, loc : (Position, Positi
   }
 }
 
-pub fn expr(tokens : Array[(Token, Position, Position)], initial_pos? : Position) -> @syntax.Term!ParseError {
-  yy_parse!(
+pub fn expr(tokens : Array[(Token, @syntax.Pos, @syntax.Pos)], initial_pos? : @syntax.Pos) -> @syntax.Term raise ParseError {
+  yy_parse(
     tokens,
     yy_state_0,
-    fn {
-      YYObj__syntax_Term(result) => result
-      _ => panic()
+    (it) => {
+      guard it is YYObj__syntax_Term(result)
+      result
     },
     initial_pos?,
   )

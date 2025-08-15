@@ -1,7 +1,7 @@
 ///|
 test {
-  inspect!(
-    expr!([
+  inspect(
+    expr([
       (IF, { line: 1, character: 0 }, { line: 1, character: 2 }),
       (ISZERO, { line: 1, character: 3 }, { line: 1, character: 9 }),
       (ZERO, { line: 1, character: 10 }, { line: 1, character: 11 }),

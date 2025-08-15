@@ -1,6 +1,9 @@
-package simple-arith/syntax
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/syntax"
 
 // Values
+
+// Errors
 
 // Types and methods
 pub(all) struct Info {

@@ -1,10 +1,19 @@
-package simple-arith/lexer
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/lexer"
 
-alias @simple-arith/parser as @parser
-alias @simple-arith/syntax as @syntax
+import(
+  "simple-arith/parser"
+  "simple-arith/syntax"
+)
 
 // Values
-fn tokenize(String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)]!LexError
+fn tokenize(String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)] raise LexError
+
+// Errors
+pub suberror LexError {
+  UnrecognizedChar(@syntax.Pos, Char)
+}
+impl Show for LexError
 
 // Types and methods
 pub(all) struct LexEngine {
@@ -13,21 +22,10 @@ pub(all) struct LexEngine {
   start_tags : Array[Int]
   code_blocks_n : Int
 }
-impl LexEngine {
-  run(Self, Lexbuf) -> (Int, Array[(Int, Int)])
-}
-
-pub type! LexError {
-  UnrecognizedChar(@syntax.Pos, Char)
-}
-impl Show for LexError
+fn LexEngine::run(Self, Lexbuf) -> (Int, Array[(Int, Int)])
 
 type Lexbuf
-impl Lexbuf {
-  from_string(String) -> Self
-}
-
-type LineTrackingContext
+fn Lexbuf::from_string(String) -> Self
 
 // Type aliases
 

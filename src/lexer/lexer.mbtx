@@ -1,10 +1,10 @@
 {
-priv type! EndOfFile
-pub type! LexError {
+priv suberror EndOfFile
+pub suberror LexError {
   UnrecognizedChar(@syntax.Pos, Char)
 } derive(Show)
 
-struct LineTrackingContext {
+priv struct LineTrackingContext {
   mut line: Int
   mut line_start: Int
 }
@@ -19,10 +19,10 @@ fn pos(self : LineTrackingContext, pos: Int) -> @syntax.Pos {
 }
 }
 
-rule token(line_ctx : LineTrackingContext) -> (@parser.Token, @syntax.Pos, @syntax.Pos)!Error {
+rule token(line_ctx : LineTrackingContext) -> (@parser.Token, @syntax.Pos, @syntax.Pos) raise Error {
   parse {
-    [' ' '\t' '\r']+ => { token!(line_ctx, lexbuf) }
-    '\n' as t => { line_ctx.new_line($endpos(t)); token!(line_ctx, lexbuf) }
+    [' ' '\t' '\r']+ => { token(line_ctx, lexbuf) }
+    '\n' as t => { line_ctx.new_line($endpos(t)); token(line_ctx, lexbuf) }
     "if" as t => { (IF, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "then" as t => { (THEN, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     "else" as t => { (ELSE, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
@@ -35,17 +35,17 @@ rule token(line_ctx : LineTrackingContext) -> (@parser.Token, @syntax.Pos, @synt
     "(" as t => { (LPAREN, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     ")" as t => { (RPAREN, line_ctx.pos($startpos(t)), line_ctx.pos($endpos(t))) }
     eof => { raise EndOfFile }
-    _ as t => { raise UnrecognizedChar(line_ctx.pos($startpos(t)), t[0]) }
+    _ as t => { raise UnrecognizedChar(line_ctx.pos($startpos(t)), t[0].unsafe_to_char()) }
   }
 }
 
 {
-pub fn tokenize(input : String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)]!LexError {
+pub fn tokenize(input : String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)]raise LexError {
   let buf = Lexbuf::from_string(input)
   let line_ctx = { line: 1, line_start: 0 }
   let result = []
   while true {
-    try token!(line_ctx, buf) catch {
+    try token(line_ctx, buf) catch {
       EndOfFile => break
       UnrecognizedChar(_) as err => raise err
       _ => panic()
