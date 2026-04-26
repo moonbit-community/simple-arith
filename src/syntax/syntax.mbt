@@ -7,16 +7,16 @@ pub(all) enum Term {
   TmSucc(Info, Term)
   TmPred(Info, Term)
   TmIsZero(Info, Term)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) struct Info {
   loc_start : Pos
   loc_end : Pos
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) struct Pos {
   line : Int
   character : Int
-} derive(Show)
+} derive(Debug)

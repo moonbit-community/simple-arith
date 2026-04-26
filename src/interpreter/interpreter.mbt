@@ -1,19 +1,19 @@
 ///|
 pub suberror EvalError {
   TypeAssertFail(Value, Type)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) enum Type {
   BoolType
   IntType
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) enum Value {
   Bool(Bool)
   Int(Int)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub fn eval(term : @syntax.Term) -> Value raise EvalError {

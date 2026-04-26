@@ -1,5 +1,6 @@
 import {
   "simple-arith/syntax" @syntax,
+  "moonbitlang/core/list" @list,
 }
 
 warnings = "-6"

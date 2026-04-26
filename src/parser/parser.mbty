@@ -1,5 +1,5 @@
 %start expr
-%derive<Show> Token
+%derive<Debug> Token
 %position<@syntax.Pos>
 
 %token TRUE

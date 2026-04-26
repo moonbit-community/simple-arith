@@ -3,6 +3,8 @@ import {
   "simple-arith/parser" @parser,
 }
 
+warnings = "-23"
+
 options(
   "pre-build": [
     {
