@@ -1,0 +1,16 @@
+import {
+  "simple-arith/syntax" @syntax,
+  "moonbitlang/core/list" @list,
+}
+
+warnings = "-6"
+
+options(
+  "pre-build": [
+    {
+      "command": "$mod_dir/.mooncakes/moonbitlang/yacc/moonyacc $input -o $output",
+      "input": "parser.mbty",
+      "output": "parser.mbt",
+    },
+  ],
+)

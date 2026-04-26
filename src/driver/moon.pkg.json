@@ -1,7 +1,0 @@
-{
-  "import": [
-    "simple-arith/interpreter",
-    "simple-arith/lexer",
-    "simple-arith/parser"
-  ]
-}

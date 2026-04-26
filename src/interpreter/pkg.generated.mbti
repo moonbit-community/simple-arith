@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/interpreter"
+
+import {
+  "moonbitlang/core/debug",
+  "simple-arith/syntax",
+}
+
+// Values
+pub fn eval(@syntax.Term) -> Value raise EvalError
+
+// Errors
+pub suberror EvalError {
+  TypeAssertFail(Value, Type)
+} derive(@debug.Debug)
+pub impl Show for EvalError
+
+// Types and methods
+pub(all) enum Type {
+  BoolType
+  IntType
+} derive(@debug.Debug)
+pub impl Show for Type
+
+pub(all) enum Value {
+  Bool(Bool)
+  Int(Int)
+} derive(@debug.Debug)
+pub impl Show for Value
+
+// Type aliases
+
+// Traits
+

@@ -2,19 +2,19 @@
 priv suberror EndOfFile
 pub suberror LexError {
   UnrecognizedChar(@syntax.Pos, Char)
-} derive(Show)
+} derive(Debug)
 
 priv struct LineTrackingContext {
   mut line: Int
   mut line_start: Int
 }
 
-fn new_line(self : LineTrackingContext, pos: Int) -> Unit {
+fn LineTrackingContext::new_line(self : LineTrackingContext, pos: Int) -> Unit {
   self.line += 1
   self.line_start = pos
 }
 
-fn pos(self : LineTrackingContext, pos: Int) -> @syntax.Pos {
+fn LineTrackingContext::pos(self : LineTrackingContext, pos: Int) -> @syntax.Pos {
   { line: self.line, character: pos - self.line_start }
 }
 }

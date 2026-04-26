@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "simple-arith/lexer"
+
+import {
+  "moonbitlang/core/debug",
+  "simple-arith/parser",
+  "simple-arith/syntax",
+}
+
+// Values
+pub fn tokenize(String) -> Array[(@parser.Token, @syntax.Pos, @syntax.Pos)] raise LexError
+
+// Errors
+pub suberror LexError {
+  UnrecognizedChar(@syntax.Pos, Char)
+} derive(@debug.Debug)
+pub impl Show for LexError
+
+// Types and methods
+pub(all) struct LexEngine {
+  graph : Array[(Int) -> (Int, Array[Array[Int]])]
+  end_nodes : Array[(Int, Array[((Int, Int), (Int, Int))])?]
+  start_tags : Array[Int]
+  code_blocks_n : Int
+}
+pub fn LexEngine::run(Self, Lexbuf) -> (Int, Array[(Int, Int)])
+
+type Lexbuf
+pub fn Lexbuf::from_string(String) -> Self
+
+// Type aliases
+
+// Traits
+

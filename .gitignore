@@ -2,3 +2,8 @@
 
 /.mooncakes
 /target
+_build/
+
+/src/lexer/lexer.mbt
+/src/parser/parser.mbt
+/src/parser/parser.mbt.map.json

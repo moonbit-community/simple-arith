@@ -1,19 +1,19 @@
 ///|
 pub suberror EvalError {
   TypeAssertFail(Value, Type)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) enum Type {
   BoolType
   IntType
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub(all) enum Value {
   Bool(Bool)
   Int(Int)
-} derive(Show)
+} derive(Debug)
 
 ///|
 pub fn eval(term : @syntax.Term) -> Value raise EvalError {
@@ -47,7 +47,7 @@ pub fn eval(term : @syntax.Term) -> Value raise EvalError {
 }
 
 ///|
-fn assert_bool(self : Value) -> Bool raise EvalError {
+fn Value::assert_bool(self : Value) -> Bool raise EvalError {
   match self {
     Bool(value) => value
     Int(_) => raise TypeAssertFail(self, IntType)
@@ -55,7 +55,7 @@ fn assert_bool(self : Value) -> Bool raise EvalError {
 }
 
 ///|
-fn assert_int(self : Value) -> Int raise EvalError {
+fn Value::assert_int(self : Value) -> Int raise EvalError {
   match self {
     Int(value) => value
     Bool(_) => raise TypeAssertFail(self, BoolType)
